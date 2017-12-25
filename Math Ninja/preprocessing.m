@@ -3,19 +3,18 @@
 clear all
 
 %% Read Image
-I = imread('Case 3/3.2.jpg');
+I = imread('Case 4/4.2.jpg');
+Original = I;
  [Wi Hi Li] = size(I);
  I = imresize(I,[Wi*1.5 Hi*1.5]);
 %% Show image
 figure(1)
 imshow(I);
 title('INPUT IMAGE WITH NOISE')
-
 %% Convert to gray scale
 if size(I,3) == 3 % RGB image
   I=rgb2gray(I);
 end
-
 % I = imadjust(I);
 
 [H, W] = size(I);
@@ -64,18 +63,24 @@ end
       indx = n;
   end
  end
- equation = imcrop(I, DilatedObjects(indx).BoundingBox);
+ offset = 5;
+ equation = imcrop(I, [ceil(DilatedObjects(indx).BoundingBox(1))-offset,ceil(DilatedObjects(indx).BoundingBox(2))-offset,ceil(DilatedObjects(indx).BoundingBox(3)-offset),ceil(DilatedObjects(indx).BoundingBox(4)-offset)]);
+ equation = imclearborder(equation);
  figure(8)
  imshow(equation);
-
+ 
  %% Label connected components
 [L, number_of_cc] = bwlabel(equation);
 
 %% Measure properties of image regions
 region_props = regionprops(L, 'BoundingBox');
-
-
  hold off
+
+%% Check if there is regions inside regions
+RL = checkInshape(region_props);
+for n = 1 : size(RL)
+   region_props(RL(n)) = [];
+end
 hold on
 
 
